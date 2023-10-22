@@ -206,31 +206,28 @@ app.post("/transfer", async (req, res) => {
 app.post("/create-payment-seccion", async (req, res) => {
   
     try {
-      const session = await stripe.checkout.sessions.create(
-        {
-          mode: 'payment',
-          payment_method_types: ['card'],
-          line_items: [
-            {
-              price: 'price_1O3mjGLPle8F5nu6UG9tuTl6',
-              quantity: 1,
-            },
-          ],
-          payment_intent_data: {
-            application_fee_amount: 100,
+      const session = await stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        line_items: [
+          {
+            price: 'price_1O3mjGLPle8F5nu6UG9tuTl6', // Use o price correto associado ao produto
+            quantity: 1,
           },
-          success_url: 'http://localhost:5173/sucess',
-          cancel_url: 'http://localhost:5173/cancel',
+        ],
+        success_url: 'http://localhost:5173/response-pay',
+        cancel_url: 'http://localhost:5173/cancel',
+        payment_intent_data: {
+          application_fee_amount: 100,
+          transfer_data: {
+            destination: 'acct_1O3gKGQ1oMafWcgg',
+          },
         },
-        {
-          // conta do prestador
-          stripeAccount: 'acct_1O3gKGQ1oMafWcgg',
-        }
-      );
+      });
   
       // https://connect.stripe.com/d/setup/e/_Oq38PWgz5aVbpVpOFqTvHsL2vk/YWNjdF8xTzJOMlpQcWF2d2Izb0dl/9b85a90b778bceaa5
   
-      console.log('pos => ', paymentIntent)
+      console.log('pos => ', session)
       // Send publishable key and PaymentIntent details to client
       res.send(session);
     } catch (e) {
